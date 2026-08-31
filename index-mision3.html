@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merge Sort vs Quick Sort</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --ink: #12141f;
+    --panel: #191d2e;
+    --panel-2: #1f2438;
+    --border: #2c3149;
+    --text: #edeff6;
+    --muted: #8b91ac;
+    --cpp: #f0a857;
+    --py: #45c9a5;
+    --accent: #8797ff;
+    --win: #45c9a5;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(135,151,255,0.10), transparent 40%),
+      radial-gradient(circle at 88% 0%, rgba(69,201,165,0.08), transparent 45%);
+  }
+
+  .wrap{
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 64px 24px 96px;
+  }
+
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    margin: 0 0 18px;
+  }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(32px, 5vw, 50px);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    margin: 0 0 20px;
+    max-width: 14ch;
+  }
+
+  .lede{
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 58ch;
+    margin: 0 0 48px;
+  }
+
+  .split-hero{
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 56px;
+  }
+
+  .split-row{
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .split-row .tag{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    width: 108px;
+    flex-shrink: 0;
+  }
+
+  .bar{
+    flex: 1;
+    display: flex;
+    gap: 3px;
+    height: 46px;
+  }
+
+  .bar span{
+    flex: 1;
+    border-radius: 6px;
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    animation: rise 0.6s ease backwards;
+  }
+
+  .bar.two span:nth-child(1){ animation-delay: .05s; }
+  .bar.two span:nth-child(2){ animation-delay: .15s; }
+  .bar.three span:nth-child(1){ animation-delay: .05s; }
+  .bar.three span:nth-child(2){ animation-delay: .15s; }
+  .bar.three span:nth-child(3){ animation-delay: .25s; }
+
+  .bar span::after{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    opacity: 0.14;
+  }
+
+  .bar.three span::after{ background: var(--py); opacity: .16; }
+
+  @keyframes rise{
+    from{ transform: scaleY(0); opacity: 0; }
+    to{ transform: scaleY(1); opacity: 1; }
+  }
+
+  .section-label{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 14px;
+  }
+
+  .datasets{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .ds-btn{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 14px;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    transition: border-color .15s ease, background .15s ease;
+  }
+
+  .ds-btn:hover{ border-color: var(--accent); }
+
+  .ds-btn.active{
+    background: var(--panel-2);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent) inset;
+  }
+
+  .ds-btn .name{
+    display: block;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .ds-btn .n{
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .ds-desc{
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0 0 44px;
+    min-height: 20px;
+  }
+
+  .results{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .panel{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .panel-head{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dot{
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+
+  .panel.cpp .dot{ background: var(--cpp); }
+  .panel.py .dot{ background: var(--py); }
+
+  .panel-head h2{
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+  }
+
+  th{
+    text-align: right;
+    font-weight: 500;
+    color: var(--muted);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+  }
+
+  th:first-child, td:first-child{ text-align: left; }
+
+  td{
+    text-align: right;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tr:last-child td{ border-bottom: none; }
+
+  tr.winner td{ color: var(--win); }
+
+  tr.winner td:first-child::after{
+    content: ' \25B2';
+    font-size: 9px;
+  }
+
+  .foot{
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .foot code{
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--panel);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  @media (max-width: 680px){
+    .datasets{ grid-template-columns: repeat(2, 1fr); }
+    .results{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <p class="eyebrow">Misión 3 — Divide y Vencerás</p>
+  <h1>¿Es mejor dividir entre 3 que entre 2?</h1>
+  <p class="lede">
+    Merge Sort y Quick Sort clásicos, contra versiones modificadas que parten los datos en tres
+    en lugar de dos. Elige un dataset para ver cómo se comportó cada algoritmo, en C++ y en Python.
+  </p>
+
+  <div class="split-hero" aria-hidden="true">
+    <div class="split-row">
+      <span class="tag">división en 2</span>
+      <div class="bar two"><span></span><span></span></div>
+    </div>
+    <div class="split-row">
+      <span class="tag">división en 3</span>
+      <div class="bar three"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <p class="section-label">01 · Elige un dataset</p>
+  <div class="datasets" id="datasets"></div>
+  <p class="ds-desc" id="dsDesc"></p>
+
+  <p class="section-label">02 · Resultados</p>
+  <div class="results">
+    <div class="panel cpp">
+      <div class="panel-head"><span class="dot"></span><h2>C++</h2></div>
+      <table>
+        <thead>
+          <tr><th>Algoritmo</th><th>Comparaciones</th><th>Intercambios</th><th>Tiempo (ms)</th></tr>
+        </thead>
+        <tbody id="cppBody"></tbody>
+      </table>
+    </div>
+    <div class="panel py">
+      <div class="panel-head"><span class="dot"></span><h2>Python</h2></div>
+      <table>
+        <thead>
+          <tr><th>Algoritmo</th><th>Comparaciones</th><th>Intercambios</th><th>Tiempo (ms)</th></tr>
+        </thead>
+        <tbody id="pyBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="foot">
+    Los tiempos se generaron corriendo <code>generator.cpp</code> + <code>benchmark.cpp</code> y
+    <code>benchmark.py</code> sobre los mismos archivos de datos. El renglón marcado con ▲ es el
+    más rápido de cada tabla para ese dataset.
+  </p>
+
+</div>
+
+<script>
+  const DATASETS = {
+    random: {
+      name: "Aleatorio", n: 100000,
+      desc: "Datos completamente desordenados de forma aleatoria — caso promedio para ambos algoritmos.",
+      cpp: [
+        { alg: "MergeSort2", cmp: 1536213, mov: 1668928, ms: 10.751 },
+        { alg: "MergeSort3", cmp: 1603906, mov: 1739350, ms: 11.331 },
+        { alg: "QuickSort1", cmp: 1957370, mov: 1024727, ms: 4.211 },
+        { alg: "QuickSort2", cmp: 1945146, mov: 656206, ms: 3.688 },
+      ],
+      py: [
+        { alg: "MergeSort2", cmp: 1536213, mov: 1668928, ms: 241.694 },
+        { alg: "MergeSort3", cmp: 1603906, mov: 1739350, ms: 253.809 },
+        { alg: "QuickSort1", cmp: 1957370, mov: 1024727, ms: 157.883 },
+        { alg: "QuickSort2", cmp: 1945146, mov: 656206, ms: 157.926 },
+      ],
+    },
+    sorted: {
+      name: "Ordenado", n: 8000,
+      desc: "Datos ya ordenados en forma ascendente — peor caso esperado para Quick Sort.",
+      cpp: [
+        { alg: "MergeSort2", cmp: 52352, mov: 103808, ms: 0.608 },
+        { alg: "MergeSort3", cmp: 63008, mov: 108056, ms: 0.534 },
+        { alg: "QuickSort1", cmp: 31996000, mov: 32003999, ms: 17.978 },
+        { alg: "QuickSort2", cmp: 31992000, mov: 8000, ms: 8.246 },
+      ],
+      py: [
+        { alg: "MergeSort2", cmp: 52352, mov: 103808, ms: 12.766 },
+        { alg: "MergeSort3", cmp: 63008, mov: 108056, ms: 14.605 },
+        { alg: "QuickSort1", cmp: 31996000, mov: 32003999, ms: 3033.016 },
+        { alg: "QuickSort2", cmp: 31992000, mov: 8000, ms: 1339.072 },
+      ],
+    },
+    reverse: {
+      name: "Inverso", n: 8000,
+      desc: "Datos ordenados en forma inversa — también peor caso esperado.",
+      cpp: [
+        { alg: "MergeSort2", cmp: 51472, mov: 103808, ms: 0.490 },
+        { alg: "MergeSort3", cmp: 45069, mov: 108056, ms: 0.516 },
+        { alg: "QuickSort1", cmp: 31913114, mov: 15962534, ms: 16.691 },
+        { alg: "QuickSort2", cmp: 31992000, mov: 12000, ms: 6.914 },
+      ],
+      py: [
+        { alg: "MergeSort2", cmp: 51472, mov: 103808, ms: 13.320 },
+        { alg: "MergeSort3", cmp: 45069, mov: 108056, ms: 14.180 },
+        { alg: "QuickSort1", cmp: 31913114, mov: 15962534, ms: 2096.719 },
+        { alg: "QuickSort2", cmp: 31992000, mov: 12000, ms: 1347.742 },
+      ],
+    },
+    partial: {
+      name: "Parcial", n: 8000,
+      desc: "Bloques de tamaño n/10 ya ordenados individualmente — segmentos grandes ordenados.",
+      cpp: [
+        { alg: "MergeSort2", cmp: 69090, mov: 103808, ms: 0.563 },
+        { alg: "MergeSort3", cmp: 75969, mov: 108056, ms: 0.609 },
+        { alg: "QuickSort1", cmp: 3228834, mov: 3216514, ms: 2.038 },
+        { alg: "QuickSort2", cmp: 197594, mov: 60630, ms: 0.187 },
+      ],
+      py: [
+        { alg: "MergeSort2", cmp: 69090, mov: 103808, ms: 14.152 },
+        { alg: "MergeSort3", cmp: 75969, mov: 108056, ms: 18.340 },
+        { alg: "QuickSort1", cmp: 3228834, mov: 3216514, ms: 308.730 },
+        { alg: "QuickSort2", cmp: 197594, mov: 60630, ms: 15.094 },
+      ],
+    },
+  };
+
+  const fmt = n => n.toLocaleString("en-US");
+
+  function renderTable(tbodyId, rows){
+    const tbody = document.getElementById(tbodyId);
+    const minMs = Math.min(...rows.map(r => r.ms));
+    tbody.innerHTML = rows.map(r => `
+      <tr class="${r.ms === minMs ? 'winner' : ''}">
+        <td>${r.alg}</td>
+        <td>${fmt(r.cmp)}</td>
+        <td>${fmt(r.mov)}</td>
+        <td>${r.ms.toFixed(3)}</td>
+      </tr>
+    `).join("");
+  }
+
+  function selectDataset(key){
+    const d = DATASETS[key];
+    document.querySelectorAll(".ds-btn").forEach(b => b.classList.toggle("active", b.dataset.key === key));
+    document.getElementById("dsDesc").textContent = `N = ${fmt(d.n)} — ${d.desc}`;
+    renderTable("cppBody", d.cpp);
+    renderTable("pyBody", d.py);
+  }
+
+  const container = document.getElementById("datasets");
+  Object.entries(DATASETS).forEach(([key, d], i) => {
+    const btn = document.createElement("button");
+    btn.className = "ds-btn";
+    btn.dataset.key = key;
+    btn.innerHTML = `<span class="name">${d.name}</span><span class="n">N = ${fmt(d.n)}</span>`;
+    btn.addEventListener("click", () => selectDataset(key));
+    container.appendChild(btn);
+  });
+
+  selectDataset("random");
+</script>
+
+</body>
+</html>
