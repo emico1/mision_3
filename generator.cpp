@@ -19,23 +19,23 @@ int main(int argc, char** argv) {
     std::mt19937 rng(42);
     std::uniform_int_distribution<int> dist(0, 1000000);
 
-    //1. aleatorio
+    //aleatorio
     std::vector<int> random(nEasy);
     for (int& v : random) v = dist(rng);
     writeFile("data_random.txt", random);
 
-    //2. ya ordenado ascendente
+    //ya ordenado ascendente
     std::vector<int> sorted(nHard);
     for (int& v : sorted) v = dist(rng);
     std::sort(sorted.begin(), sorted.end());
     writeFile("data_sorted.txt", sorted);
 
-    //3. ordenado en forma inversa
+    //ordenado en forma inversa
     std::vector<int> reverse = sorted;
     std::reverse(reverse.begin(), reverse.end());
     writeFile("data_reverse.txt", reverse);
 
-    //4. parcialmente ordenado: bloques grandes ya ordenados
+    //parcialmente ordenado: bloques grandes ya ordenados
     std::vector<int> partial(nHard);
     for (int& v : partial) v = dist(rng);
     int blockSize = std::max(1, nHard / 10);

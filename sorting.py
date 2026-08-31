@@ -4,7 +4,7 @@ class Metrics:
         self.moves = 0
 
 
-# ---------- MERGE SORT CLASICO (2 particiones) - O(n log n) ----------
+# MERGE SORT CLASICO (2 particiones) - O(n log n)
 
 def merge2(arr, lo, mid, hi, m):
     left = arr[lo:mid + 1]
@@ -34,7 +34,7 @@ def merge_sort2(arr, lo, hi, m):
     merge2(arr, lo, mid, hi, m)
 
 
-# ---------- MERGE SORT MODIFICADO (3 particiones) ----------
+# MERGE SORT MODIFICADO (3 particiones)
 
 def merge_sort3(arr, lo, hi, m):
     length = hi - lo + 1
@@ -51,7 +51,7 @@ def merge_sort3(arr, lo, hi, m):
     merge2(arr, lo, mid2, hi, m)     # une resultado con el ultimo tercio
 
 
-# ---------- QUICK SORT CLASICO (1 pivote, Lomuto) ----------
+# QUICK SORT CLASICO (1 pivote, Lomuto) 
 
 def partition1(arr, lo, hi, m):
     pivot = arr[hi]
@@ -74,7 +74,7 @@ def quick_sort1(arr, lo, hi, m):
         quick_sort1(arr, p + 1, hi, m)
 
 
-# ---------- QUICK SORT MODIFICADO (2 pivotes: primero y ultimo, 3 particiones) ----------
+# QUICK SORT MODIFICADO (2 pivotes: primero y ultimo, 3 particiones)
 
 def quick_sort2(arr, lo, hi, m):
     if lo >= hi:
